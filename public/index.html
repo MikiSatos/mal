@@ -33,16 +33,17 @@
 
     <div class="layout">
         <aside class="sidebar">
-            <div class="menu-item active">🔥 Главная</div>
-            <div class="menu-item">💎 Избранное</div>
-            <div class="menu-item">💬 Обсуждения</div>
+            <div class="menu-item active" onclick="loadArticles(); highlightMenu(this)">🔥 Главная</div>
+            <div class="menu-item" onclick="loadFavorites(); highlightMenu(this)">💎 Избранное</div>
+            <div class="menu-item" onclick="loadDiscussions(); highlightMenu(this)">💬 Обсуждения</div>
             <hr>
             <div class="menu-section">РЕСУРСЫ</div>
-            <div class="menu-item">О нас</div>
-            <div class="menu-item">Правила</div>
+            <div class="menu-item" onclick="loadAbout(); highlightMenu(this)">О нас</div>
+            <div class="menu-item" onclick="loadRules(); highlightMenu(this)">Правила</div>
         </aside>
 
-        <main id="app"></main>
+        <main id="app">
+            </main>
     </div>
 
     <div id="create-modal" class="modal hidden">

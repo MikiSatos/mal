@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         updateUI(false);
     }
-    loadArticles();
+    loadArticles(); // Загружаем главную при старте
 
     // Модалка
     const modal = document.getElementById('create-modal');
@@ -52,18 +52,14 @@ function updateUI(isLoggedIn) {
     }
 }
 
-// --- СТАТЬИ ---
-async function loadArticles() {
+// --- СТАТЬИ (ГЛАВНАЯ) ---
+window.loadArticles = async function() {
     try {
         const res = await fetch(`${API_URL}/articles`);
         const articles = await res.json();
         
-        // Убираем кнопку "Назад"
-        const btnHome = document.getElementById('btn-home-view');
-        if(btnHome) btnHome.style.display = 'none';
-
         let html = '<h2>Последние статьи</h2>';
-        if (articles.length === 0) html += '<p>Пусто.</p>';
+        if (articles.length === 0) html += '<p>Пока нет статей. Будьте первым!</p>';
 
         articles.forEach(a => {
             const imgHtml = a.imageUrl ? `<img src="${a.imageUrl}" class="card-image">` : '';
@@ -84,19 +80,18 @@ async function loadArticles() {
             `;
         });
         app.innerHTML = html;
-        if(currentUser) updateUI(true);
     } catch (e) { console.error(e); }
 }
 
-// --- ДЕТАЛИ ---
+// --- ДЕТАЛИ СТАТЬИ ---
 window.loadArticleDetails = async function(id) {
     try {
         const res = await fetch(`${API_URL}/articles/${id}`);
         const article = await res.json();
 
         // Показываем кнопку Назад
-        document.getElementById('auth-controls').innerHTML = `<button class="btn-secondary" onclick="loadArticles()">← Назад</button>`;
-
+        // (Она уже есть в HTML макета, но тут мы обновляем UI внутри статьи)
+        
         const imgHtml = article.imageUrl ? `<img src="${article.imageUrl}" class="full-article-image">` : '';
         const avaHtml = article.authorAvatar ? `<img src="${article.authorAvatar}" class="mini-ava">` : '';
 
@@ -142,6 +137,7 @@ window.loadArticleDetails = async function(id) {
 
         app.innerHTML = `
             <div class="full-article">
+                <button class="btn-secondary" onclick="loadArticles()" style="margin-bottom:20px;">← Назад</button>
                 ${imgHtml}
                 <h1>${article.title}</h1>
                 <div class="meta" style="display:flex;align-items:center;gap:10px;">${avaHtml} ${article.author}</div>
@@ -178,10 +174,12 @@ window.submitArticle = async function() {
     document.getElementById('create-modal').classList.add('hidden');
     document.getElementById('new-title').value = '';
     document.getElementById('new-content').value = '';
+    // Сбрасываем файл
+    document.getElementById('new-image-file').value = ''; 
     loadArticles();
 };
 
-// --- ОСТАЛЬНОЕ ---
+// --- ФУНКЦИИ КОММЕНТАРИЕВ И УДАЛЕНИЯ ---
 window.sendComment = async function(id) {
     if(!currentUser) return;
     const text = document.getElementById('c-text').value;
@@ -212,3 +210,49 @@ window.deleteArticle = async function(id) {
     const res = await fetch(`${API_URL}/articles/${id}`, { method: 'DELETE', headers: { 'x-admin-password': p }});
     if(res.ok) { alert("Deleted"); loadArticles(); } else { alert("Error"); }
 };
+
+// --- ЛОГИКА МЕНЮ (НОВОЕ) ---
+window.highlightMenu = function(element) {
+    document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+    element.classList.add('active');
+}
+
+window.loadFavorites = function() {
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>💎 Избранное</h1>
+            <p>Этот раздел находится в разработке.</p>
+            <p>Здесь вы сможете сохранять понравившиеся статьи.</p>
+        </div>`;
+}
+
+window.loadDiscussions = function() {
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>💬 Обсуждения</h1>
+            <p>Лента последних комментариев (в разработке).</p>
+        </div>`;
+}
+
+window.loadAbout = function() {
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>О нас</h1>
+            <p>Добро пожаловать в <strong>B&Y BLOG</strong>!</p>
+            <p>Мы создали это пространство для обмена идеями, новостями и творчеством.</p>
+            <p>Версия платформы: 1.0.0</p>
+        </div>`;
+}
+
+window.loadRules = function() {
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>Правила сообщества</h1>
+            <ul>
+                <li>1. Уважайте других участников.</li>
+                <li>2. Запрещен спам и реклама.</li>
+                <li>3. Нецензурная лексика не приветствуется.</li>
+                <li>4. Соблюдайте законы.</li>
+            </ul>
+        </div>`;
+}
