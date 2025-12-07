@@ -13,10 +13,20 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
+// --- !!! ВАЖНОЕ ИСПРАВЛЕНИЕ !!! ---
+// Автоматическое создание папки для загрузок при запуске
+const uploadDir = path.join(__dirname, 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+    console.log('Папка public/uploads не найдена. Создаю...');
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+// ----------------------------------
+
 // --- ЗАГРУЗКА ФАЙЛОВ ---
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'public/uploads/'),
     filename: (req, file, cb) => {
+        // Делаем имя уникальным + русские буквы переводим в безопасный вид
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, uniqueSuffix + path.extname(file.originalname));
     }
@@ -24,6 +34,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // --- ФАЙЛ БД ---
+// Проверяем, есть ли файл с данными, если нет — создаем пустой
+if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2));
+}
+
 const readData = () => {
     try {
         if (!fs.existsSync(DATA_FILE)) return [];
@@ -42,7 +57,7 @@ app.get('/api/articles', (req, res) => {
         title: a.title,
         excerpt: a.content.substring(0, 100) + '...',
         author: a.author,
-        authorAvatar: a.authorAvatar, // Отдаем аватарку
+        authorAvatar: a.authorAvatar,
         imageUrl: a.imageUrl
     }));
     res.json(summary);
@@ -58,24 +73,32 @@ app.get('/api/articles/:id', (req, res) => {
 
 // 3. СОЗДАТЬ (Файл + Данные из ТГ)
 app.post('/api/articles', upload.single('imageFile'), (req, res) => {
-    const { title, content, author, authorAvatar } = req.body;
-    
-    if (!title || !content || !author) return res.status(400).json({ message: "Empty fields" });
+    try {
+        const { title, content, author, authorAvatar } = req.body;
+        
+        if (!title || !content || !author) return res.status(400).json({ message: "Empty fields" });
 
-    let imageUrl = "";
-    if (req.file) imageUrl = `/uploads/${req.file.filename}`;
+        let imageUrl = "";
+        if (req.file) {
+            // Render (и Linux) любят слеши в эту сторону: /
+            imageUrl = `/uploads/${req.file.filename}`;
+        }
 
-    const articles = readData();
-    const newArticle = {
-        id: Date.now(),
-        title, content, author,
-        authorAvatar: authorAvatar || "",
-        imageUrl,
-        comments: []
-    };
-    articles.push(newArticle);
-    writeData(articles);
-    res.status(201).json(newArticle);
+        const articles = readData();
+        const newArticle = {
+            id: Date.now(),
+            title, content, author,
+            authorAvatar: authorAvatar || "",
+            imageUrl,
+            comments: []
+        };
+        articles.push(newArticle);
+        writeData(articles);
+        res.status(201).json(newArticle);
+    } catch (err) {
+        console.error("Ошибка при создании:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 // 4. Удалить
@@ -116,5 +139,5 @@ app.post('/api/articles/:artId/comments/:comId/replies', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://127.0.0.1:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
