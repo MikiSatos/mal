@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B&Y Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">B&Y BLOG</div>
+        
+        <div class="header-right">
+            <div id="auth-controls"></div>
+
+            <div id="user-profile" style="display: none;">
+                <img id="user-avatar" src="" alt="Avatar">
+                <span id="user-name">User</span>
+                <button class="btn-secondary" onclick="logout()" style="margin-left:10px;">Выйти</button>
+            </div>
+
+            <div id="tg-login-btn">
+                <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                    data-telegram-login="My_Super_Blog_123_bot" 
+                    data-size="medium" 
+                    data-radius="5" 
+                    data-onauth="onTelegramAuth(user)" 
+                    data-request-access="write"></script>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="menu-item active">🔥 Главная</div>
+            <div class="menu-item">💎 Избранное</div>
+            <div class="menu-item">💬 Обсуждения</div>
+            <hr>
+            <div class="menu-section">РЕСУРСЫ</div>
+            <div class="menu-item">О нас</div>
+            <div class="menu-item">Правила</div>
+        </aside>
+
+        <main id="app"></main>
+    </div>
+
+    <div id="create-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Написать статью</h2>
+            
+            <input type="text" id="new-title" placeholder="Заголовок" required>
+            
+            <label style="color:#aaa; display:block; margin-bottom:5px;">Картинка (файл):</label>
+            <input type="file" id="new-image-file" accept="image/*" style="margin-bottom:15px;">
+
+            <textarea id="new-content" placeholder="Текст статьи..." rows="10" required></textarea>
+            <button onclick="submitArticle()">Опубликовать</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
