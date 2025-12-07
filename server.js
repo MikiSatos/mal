@@ -9,17 +9,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = "12345";
 
-// --- ТВОЯ БАЗА ДАННЫХ ---
-const MONGO_URI = "mongodb+srv://admin:kqjUplBZLMpdqMOI@cluster0.vgvbxdm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+// --- БЕЗОПАСНОЕ ПОДКЛЮЧЕНИЕ ---
+// Мы берем ссылку из переменных окружения (настроек Render)
+const MONGO_URI = process.env.MONGO_URL; 
+// ------------------------------
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
 // 1. Подключение к MongoDB
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('✅ MongoDB connected!'))
-    .catch(err => console.error('❌ MongoDB error:', err));
+// Добавили проверку: если ссылки нет, пишем ошибку в консоль
+if (!MONGO_URI) {
+    console.error("❌ ОШИБКА: Не найдена переменная окружения MONGO_URL! Настрой её в Render.");
+} else {
+    mongoose.connect(MONGO_URI)
+        .then(() => console.log('✅ MongoDB connected!'))
+        .catch(err => console.error('❌ MongoDB error:', err));
+}
 
 // 2. Схемы данных
 const CommentSchema = new mongoose.Schema({
@@ -47,7 +54,7 @@ const ArticleSchema = new mongoose.Schema({
 
 const Article = mongoose.model('Article', ArticleSchema);
 
-// --- Создание папки для картинок ---
+// --- Папка для картинок ---
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -64,13 +71,9 @@ const upload = multer({ storage: storage });
 
 // --- API ---
 
-// Получить все статьи
 app.get('/api/articles', async (req, res) => {
     try {
-        // Берем из базы данных
         const articles = await Article.find();
-        
-        // Отправляем на фронтенд
         res.json(articles.map(a => ({
             id: a.id,
             title: a.title,
@@ -82,7 +85,6 @@ app.get('/api/articles', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Получить одну статью
 app.get('/api/articles/:id', async (req, res) => {
     try {
         const article = await Article.findOne({ id: req.params.id });
@@ -91,17 +93,14 @@ app.get('/api/articles/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Создать статью
 app.post('/api/articles', upload.single('imageFile'), async (req, res) => {
     try {
         const { title, content, author, authorAvatar } = req.body;
-        
         if (!title || !content || !author) return res.status(400).json({ message: "Empty fields" });
 
         let imageUrl = "";
         if (req.file) imageUrl = `/uploads/${req.file.filename}`;
 
-        // Создаем новую запись в MongoDB
         const newArticle = new Article({
             id: Date.now(),
             title, content, author,
@@ -110,15 +109,11 @@ app.post('/api/articles', upload.single('imageFile'), async (req, res) => {
             comments: []
         });
 
-        await newArticle.save(); // Сохраняем навсегда
+        await newArticle.save();
         res.status(201).json(newArticle);
-    } catch (err) { 
-        console.error(err);
-        res.status(500).json({ error: err.message }); 
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Удалить статью
 app.delete('/api/articles/:id', async (req, res) => {
     if (req.headers['x-admin-password'] !== ADMIN_PASSWORD) return res.status(403).json({ message: "Wrong password" });
     try {
@@ -127,7 +122,6 @@ app.delete('/api/articles/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Добавить комментарий
 app.post('/api/articles/:id/comments', async (req, res) => {
     try {
         const article = await Article.findOne({ id: req.params.id });
@@ -140,14 +134,12 @@ app.post('/api/articles/:id/comments', async (req, res) => {
             authorAvatar: req.body.authorAvatar || "", 
             replies: [] 
         };
-        
         article.comments.push(newComment);
-        await article.save(); // Обновляем статью в базе
+        await article.save();
         res.status(201).json(newComment);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Ответить на комментарий
 app.post('/api/articles/:artId/comments/:comId/replies', async (req, res) => {
     try {
         const article = await Article.findOne({ id: req.params.artId });
@@ -162,7 +154,6 @@ app.post('/api/articles/:artId/comments/:comId/replies', async (req, res) => {
             text: req.body.text,
             authorAvatar: req.body.authorAvatar || ""
         });
-        
         await article.save();
         res.json({ message: "OK" });
     } catch (err) { res.status(500).json({ error: err.message }); }
