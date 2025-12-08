@@ -161,3 +161,24 @@ input:focus, textarea:focus { border-color: #FFD700; outline: none; box-shadow: 
     color: #FFD700;
     padding: 10px;
 }
+
+/* Кнопка Google */
+.google-btn {
+    background: white; 
+    color: #333; 
+    padding: 6px 15px; 
+    border-radius: 4px; 
+    text-decoration: none; 
+    font-weight: bold; 
+    font-size: 14px;
+    display: flex; 
+    align-items: center; 
+    gap: 8px;
+    transition: 0.3s;
+    border: 1px solid #ccc;
+    height: 30px; /* Чтобы была одной высоты с Telegram */
+    box-sizing: border-box;
+}
+.google-btn:hover { 
+    background: #f1f1f1; 
+}
