@@ -131,3 +131,22 @@ input:focus, textarea:focus { border-color: #FFD700; outline: none; box-shadow: 
     object-fit: cover; border: 1px solid #555;
 }
 .header-right { display: flex; align-items: center; gap: 15px; }
+
+/* Переключатель языков */
+#lang-switch {
+    background-color: #333;
+    color: #FFD700;
+    border: 1px solid #FFD700;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 15px;
+}
+#lang-switch:hover {
+    background-color: #444;
+}
+#lang-switch option {
+    background-color: #222;
+    color: #fff;
+}

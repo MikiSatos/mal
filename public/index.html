@@ -12,12 +12,18 @@
         <div class="logo">B&Y BLOG</div>
         
         <div class="header-right">
+            <select id="lang-switch" onchange="changeLanguage(this.value)">
+                <option value="ru">🇷🇺 RU</option>
+                <option value="en">🇺🇸 EN</option>
+                <option value="pl">🇵🇱 PL</option>
+            </select>
+
             <div id="auth-controls"></div>
 
             <div id="user-profile" style="display: none;">
                 <img id="user-avatar" src="" alt="Avatar">
                 <span id="user-name">User</span>
-                <button class="btn-secondary" onclick="logout()" style="margin-left:10px;">Выйти</button>
+                <button class="btn-secondary" onclick="logout()" data-i18n="btn_logout" style="margin-left:10px;">Выйти</button>
             </div>
 
             <div id="tg-login-btn">
@@ -33,13 +39,13 @@
 
     <div class="layout">
         <aside class="sidebar">
-            <div class="menu-item active" onclick="loadArticles(); highlightMenu(this)">🔥 Главная</div>
-            <div class="menu-item" onclick="loadFavorites(); highlightMenu(this)">💎 Избранное</div>
-            <div class="menu-item" onclick="loadDiscussions(); highlightMenu(this)">💬 Обсуждения</div>
+            <div class="menu-item active" onclick="loadArticles(); highlightMenu(this)" data-i18n="menu_home">🔥 Главная</div>
+            <div class="menu-item" onclick="loadFavorites(); highlightMenu(this)" data-i18n="menu_fav">💎 Избранное</div>
+            <div class="menu-item" onclick="loadDiscussions(); highlightMenu(this)" data-i18n="menu_discuss">💬 Обсуждения</div>
             <hr>
-            <div class="menu-section">РЕСУРСЫ</div>
-            <div class="menu-item" onclick="loadAbout(); highlightMenu(this)">О нас</div>
-            <div class="menu-item" onclick="loadRules(); highlightMenu(this)">Правила</div>
+            <div class="menu-section" data-i18n="menu_resources">РЕСУРСЫ</div>
+            <div class="menu-item" onclick="loadAbout(); highlightMenu(this)" data-i18n="menu_about">О нас</div>
+            <div class="menu-item" onclick="loadRules(); highlightMenu(this)" data-i18n="menu_rules">Правила</div>
         </aside>
 
         <main id="app">
@@ -49,15 +55,15 @@
     <div id="create-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Написать статью</h2>
+            <h2 data-i18n="modal_title">Написать статью</h2>
             
-            <input type="text" id="new-title" placeholder="Заголовок" required>
+            <input type="text" id="new-title" placeholder="Заголовок..." required>
             
-            <label style="color:#aaa; display:block; margin-bottom:5px;">Картинка (файл):</label>
+            <label style="color:#aaa; display:block; margin-bottom:5px;" data-i18n="modal_image">Картинка (файл):</label>
             <input type="file" id="new-image-file" accept="image/*" style="margin-bottom:15px;">
 
             <textarea id="new-content" placeholder="Текст статьи..." rows="10" required></textarea>
-            <button onclick="submitArticle()">Опубликовать</button>
+            <button onclick="submitArticle()" data-i18n="modal_publish">Опубликовать</button>
         </div>
     </div>
 
