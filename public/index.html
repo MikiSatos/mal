@@ -13,11 +13,15 @@
         <div class="logo">B&Y BLOG</div>
         
         <div class="header-right">
-            <select id="lang-switch" onchange="changeLanguage(this.value)">
-                <option value="ru">RU</option>
-                <option value="en">EN</option>
-                <option value="pl">PL</option>
-            </select>
+            
+            <div class="lang-dropdown">
+                <button id="current-lang-btn" onclick="toggleLangMenu()">RU</button>
+                <div id="lang-menu" class="lang-menu hidden">
+                    <div onclick="changeLanguage('ru')">🇷🇺 RU</div>
+                    <div onclick="changeLanguage('en')">🇺🇸 EN</div>
+                    <div onclick="changeLanguage('pl')">🇵🇱 PL</div>
+                </div>
+            </div>
 
             <div id="auth-controls"></div>
 
@@ -28,7 +32,6 @@
             </div>
 
             <div id="login-buttons" style="display: flex; gap: 10px; align-items: center;">
-                
                 <a href="/auth/google" class="google-btn">
                     <i class="fab fa-google"></i> Google
                 </a>

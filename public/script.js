@@ -67,14 +67,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     changeLanguage(currentLang);
     updateUI(!!currentUser);
-    loadArticles(); // Загружаем главную страницу
+    loadArticles();
 
-    // Модалка
-    const modal = document.getElementById('create-modal');
+    // Модалка закрытие
     const closeBtn = document.querySelector('.close');
-    if(closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
-    window.onclick = (e) => { if(e.target === modal) modal.classList.add('hidden'); };
+    if(closeBtn) closeBtn.onclick = () => document.getElementById('create-modal').classList.add('hidden');
 });
+
+// ГЛОБАЛЬНЫЙ ОБРАБОТЧИК КЛИКОВ (Закрытие меню и модалок)
+window.onclick = function(event) {
+    const modal = document.getElementById('create-modal');
+    if (event.target === modal) modal.classList.add('hidden');
+
+    // Закрытие выпадающего меню языков
+    if (!event.target.closest('.lang-dropdown')) {
+        const menu = document.getElementById('lang-menu');
+        if (menu && !menu.classList.contains('hidden')) {
+            menu.classList.add('hidden');
+        }
+    }
+}
 
 // 3. UI
 function updateUI(isLoggedIn) {
@@ -82,7 +94,6 @@ function updateUI(isLoggedIn) {
     const profile = document.getElementById('user-profile');
     const controls = document.getElementById('auth-controls');
     
-    // Безопасная проверка языка
     const t = translations[currentLang] || translations['ru'];
 
     if (isLoggedIn && currentUser) {
@@ -99,16 +110,26 @@ function updateUI(isLoggedIn) {
     }
 }
 
+// --- НОВАЯ ФУНКЦИЯ ЯЗЫКОВ ---
+window.toggleLangMenu = function() {
+    document.getElementById('lang-menu').classList.toggle('hidden');
+}
+
 function changeLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('blog_lang', lang);
-    const sel = document.getElementById('lang-switch');
-    if(sel) sel.value = lang;
+    
+    // Обновляем текст на кнопке
+    const btn = document.getElementById('current-lang-btn');
+    if(btn) btn.innerText = lang.toUpperCase();
 
-    // Переводим текст в меню
+    // Скрываем меню
+    const menu = document.getElementById('lang-menu');
+    if(menu) menu.classList.add('hidden');
+
+    // Переводим
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        // Проверка, есть ли перевод
         const t = translations[lang] || translations['ru'];
         if (t[key]) el.innerHTML = t[key];
     });
@@ -136,48 +157,27 @@ window.logout = function() {
     window.location.href = "/";
 };
 
-// 5. НАВИГАЦИЯ (ВОТ ЧЕГО НЕ ХВАТАЛО!) 👇👇👇
+// 5. НАВИГАЦИЯ
 window.highlightMenu = function(el) {
     document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
 }
-
 window.loadFavorites = function() {
     const t = translations[currentLang] || translations['ru'];
-    app.innerHTML = `
-        <div class="full-article">
-            <h1>${t.page_fav_title}</h1>
-            <p>${t.page_fav_desc}</p>
-        </div>`;
+    app.innerHTML = `<div class="full-article"><h1>${t.page_fav_title}</h1><p>${t.page_fav_desc}</p></div>`;
 }
-
 window.loadDiscussions = function() {
     const t = translations[currentLang] || translations['ru'];
-    app.innerHTML = `
-        <div class="full-article">
-            <h1>${t.page_disc_title}</h1>
-            <p>${t.page_disc_desc}</p>
-        </div>`;
+    app.innerHTML = `<div class="full-article"><h1>${t.page_disc_title}</h1><p>${t.page_disc_desc}</p></div>`;
 }
-
 window.loadAbout = function() {
     const t = translations[currentLang] || translations['ru'];
-    app.innerHTML = `
-        <div class="full-article">
-            <h1>${t.page_about_title}</h1>
-            <p>${t.page_about_desc}</p>
-        </div>`;
+    app.innerHTML = `<div class="full-article"><h1>${t.page_about_title}</h1><p>${t.page_about_desc}</p></div>`;
 }
-
 window.loadRules = function() {
     const t = translations[currentLang] || translations['ru'];
-    app.innerHTML = `
-        <div class="full-article">
-            <h1>${t.page_rules_title}</h1>
-            <ul>${t.list_rules}</ul>
-        </div>`;
+    app.innerHTML = `<div class="full-article"><h1>${t.page_rules_title}</h1><ul>${t.list_rules}</ul></div>`;
 }
-// 👆👆👆 КОНЕЦ НАВИГАЦИИ
 
 // 6. СТАТЬИ
 window.loadArticles = async function() {
@@ -267,16 +267,12 @@ window.submitArticle = async function() {
     const title = document.getElementById('new-title').value;
     const content = document.getElementById('new-content').value;
     const file = document.getElementById('new-image-file').files[0];
-
     if(!title || !content) return alert("Empty fields");
-
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
+    formData.append('title', title); formData.append('content', content);
     formData.append('author', currentUser.first_name);
     formData.append('authorAvatar', currentUser.photo_url || "");
     if(file) formData.append('imageFile', file);
-
     await fetch(`${API_URL}/articles`, { method: 'POST', body: formData });
     document.getElementById('create-modal').classList.add('hidden');
     loadArticles();
@@ -286,8 +282,7 @@ window.sendComment = async function(id) {
     const text = document.getElementById('c-text').value;
     if(!text) return;
     await fetch(`${API_URL}/articles/${id}/comments`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ author: currentUser.first_name, authorAvatar: currentUser.photo_url, text })
     });
     loadArticleDetails(id);
