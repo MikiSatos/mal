@@ -2,7 +2,7 @@ const API_URL = '/api';
 const app = document.getElementById('app');
 let currentUser = null;
 
-// 1. СЛОВАРЬ (Должен быть в начале!)
+// 1. СЛОВАРЬ
 const translations = {
     ru: {
         menu_home: "🔥 Главная", menu_fav: "💎 Избранное", menu_discuss: "💬 Обсуждения",
@@ -12,10 +12,10 @@ const translations = {
         text_empty: "Пока нет статей. Будьте первым!", text_comments: "Комментарии",
         text_login_comment: "Войдите, чтобы комментировать",
         placeholder_title: "Заголовок...", placeholder_content: "Текст статьи...", placeholder_comment: "Текст комментария...",
-        page_fav_title: "💎 Избранное", page_fav_desc: "Раздел в разработке.",
-        page_disc_title: "💬 Обсуждения", page_disc_desc: "Лента комментариев.",
-        page_about_title: "О нас", page_about_desc: "Мы делимся идеями.",
-        page_rules_title: "Правила", list_rules: "<li>1. Уважайте других.</li>"
+        page_fav_title: "💎 Избранное", page_fav_desc: "Этот раздел находится в разработке.",
+        page_disc_title: "💬 Обсуждения", page_disc_desc: "Лента последних комментариев (в разработке).",
+        page_about_title: "О нас", page_about_desc: "Добро пожаловать в B&Y BLOG! Мы делимся идеями.",
+        page_rules_title: "Правила", list_rules: "<li>1. Уважайте других.</li><li>2. Без спама.</li>"
     },
     en: {
         menu_home: "🔥 Home", menu_fav: "💎 Favorites", menu_discuss: "💬 Discussions",
@@ -28,7 +28,7 @@ const translations = {
         page_fav_title: "💎 Favorites", page_fav_desc: "Under development.",
         page_disc_title: "💬 Discussions", page_disc_desc: "Feed under development.",
         page_about_title: "About Us", page_about_desc: "Welcome to B&Y BLOG!",
-        page_rules_title: "Rules", list_rules: "<li>1. Respect others.</li>"
+        page_rules_title: "Rules", list_rules: "<li>1. Respect others.</li><li>2. No spam.</li>"
     },
     pl: {
         menu_home: "🔥 Strona główna", menu_fav: "💎 Ulubione", menu_discuss: "💬 Dyskusje",
@@ -41,74 +41,59 @@ const translations = {
         page_fav_title: "💎 Ulubione", page_fav_desc: "W budowie.",
         page_disc_title: "💬 Dyskusje", page_disc_desc: "W budowie.",
         page_about_title: "O nas", page_about_desc: "Witamy w B&Y BLOG!",
-        page_rules_title: "Zasady", list_rules: "<li>1. Szanuj innych.</li>"
+        page_rules_title: "Zasady", list_rules: "<li>1. Szanuj innych.</li><li>2. Bez spamu.</li>"
     }
 };
 
 let currentLang = localStorage.getItem('blog_lang') || 'ru';
 
-// 2. ГЛАВНАЯ ФУНКЦИЯ ЗАПУСКА
+// 2. СТАРТ
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("🚀 Скрипт запущен!");
-
-    // --- ЛОВИМ GOOGLE ---
+    // Ловим Google
     const urlParams = new URLSearchParams(window.location.search);
     const googleUserStr = urlParams.get('googleUser');
-    
-    console.log("🔍 Проверка Google в URL:", googleUserStr);
 
     if (googleUserStr) {
         try {
             const googleUser = JSON.parse(decodeURIComponent(googleUserStr));
             currentUser = googleUser;
             localStorage.setItem('blog_user', JSON.stringify(currentUser));
-            console.log("✅ Google вход успешен:", currentUser);
-            
-            // Чистим URL
             window.history.replaceState({}, document.title, "/");
-        } catch (e) { 
-            console.error("❌ Ошибка парсинга Google:", e); 
-        }
+        } catch (e) { console.error(e); }
     } else {
-        // Обычная проверка
         const saved = localStorage.getItem('blog_user');
-        if (saved) {
-            currentUser = JSON.parse(saved);
-            console.log("✅ Восстановлен вход:", currentUser);
-        }
+        if (saved) currentUser = JSON.parse(saved);
     }
 
-    // Запуск интерфейса
     changeLanguage(currentLang);
     updateUI(!!currentUser);
-    loadArticles();
+    loadArticles(); // Загружаем главную страницу
 
-    // Модальное окно
+    // Модалка
     const modal = document.getElementById('create-modal');
     const closeBtn = document.querySelector('.close');
     if(closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
     window.onclick = (e) => { if(e.target === modal) modal.classList.add('hidden'); };
 });
 
-// 3. ФУНКЦИИ ИНТЕРФЕЙСА
+// 3. UI
 function updateUI(isLoggedIn) {
     const loginBtns = document.getElementById('login-buttons');
     const profile = document.getElementById('user-profile');
     const controls = document.getElementById('auth-controls');
     
-    // Безопасная проверка перевода
+    // Безопасная проверка языка
     const t = translations[currentLang] || translations['ru'];
-    const btnText = t.btn_new_article;
 
     if (isLoggedIn && currentUser) {
-        if(loginBtns) loginBtns.style.display = 'none'; // Скрываем кнопки входа
+        if(loginBtns) loginBtns.style.display = 'none';
         profile.style.display = 'flex';
         document.getElementById('user-name').innerText = currentUser.first_name;
         document.getElementById('user-avatar').src = currentUser.photo_url || '';
         
-        controls.innerHTML = `<button onclick="document.getElementById('create-modal').classList.remove('hidden')">${btnText}</button>`;
+        controls.innerHTML = `<button onclick="document.getElementById('create-modal').classList.remove('hidden')">${t.btn_new_article}</button>`;
     } else {
-        if(loginBtns) loginBtns.style.display = 'flex'; // Показываем кнопки
+        if(loginBtns) loginBtns.style.display = 'flex';
         profile.style.display = 'none';
         controls.innerHTML = '';
     }
@@ -120,17 +105,20 @@ function changeLanguage(lang) {
     const sel = document.getElementById('lang-switch');
     if(sel) sel.value = lang;
 
+    // Переводим текст в меню
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-            el.innerHTML = translations[lang][key];
-        }
+        // Проверка, есть ли перевод
+        const t = translations[lang] || translations['ru'];
+        if (t[key]) el.innerHTML = t[key];
     });
-    
+
     const tTitle = document.getElementById('new-title');
     const tContent = document.getElementById('new-content');
-    if(tTitle) tTitle.placeholder = translations[lang].placeholder_title;
-    if(tContent) tContent.placeholder = translations[lang].placeholder_content;
+    const t = translations[lang] || translations['ru'];
+    
+    if(tTitle) tTitle.placeholder = t.placeholder_title;
+    if(tContent) tContent.placeholder = t.placeholder_content;
 
     updateUI(!!currentUser);
 }
@@ -145,15 +133,58 @@ function onTelegramAuth(user) {
 window.logout = function() {
     localStorage.removeItem('blog_user');
     currentUser = null;
-    window.location.href = "/"; // Полная перезагрузка
+    window.location.href = "/";
 };
 
-// 5. ЗАГРУЗКА СТАТЕЙ
+// 5. НАВИГАЦИЯ (ВОТ ЧЕГО НЕ ХВАТАЛО!) 👇👇👇
+window.highlightMenu = function(el) {
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+}
+
+window.loadFavorites = function() {
+    const t = translations[currentLang] || translations['ru'];
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>${t.page_fav_title}</h1>
+            <p>${t.page_fav_desc}</p>
+        </div>`;
+}
+
+window.loadDiscussions = function() {
+    const t = translations[currentLang] || translations['ru'];
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>${t.page_disc_title}</h1>
+            <p>${t.page_disc_desc}</p>
+        </div>`;
+}
+
+window.loadAbout = function() {
+    const t = translations[currentLang] || translations['ru'];
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>${t.page_about_title}</h1>
+            <p>${t.page_about_desc}</p>
+        </div>`;
+}
+
+window.loadRules = function() {
+    const t = translations[currentLang] || translations['ru'];
+    app.innerHTML = `
+        <div class="full-article">
+            <h1>${t.page_rules_title}</h1>
+            <ul>${t.list_rules}</ul>
+        </div>`;
+}
+// 👆👆👆 КОНЕЦ НАВИГАЦИИ
+
+// 6. СТАТЬИ
 window.loadArticles = async function() {
     try {
         const res = await fetch(`${API_URL}/articles`);
         const articles = await res.json();
-        const t = translations[currentLang];
+        const t = translations[currentLang] || translations['ru'];
         
         let html = `<h2>${t.menu_home}</h2>`;
         if (articles.length === 0) html += `<p>${t.text_empty}</p>`;
@@ -177,14 +208,14 @@ window.loadArticles = async function() {
             `;
         });
         app.innerHTML = html;
-    } catch (e) { console.error("Ошибка загрузки статей:", e); }
+    } catch (e) { console.error(e); }
 }
 
 window.loadArticleDetails = async function(id) {
     try {
         const res = await fetch(`${API_URL}/articles/${id}`);
         const article = await res.json();
-        const t = translations[currentLang];
+        const t = translations[currentLang] || translations['ru'];
         
         const imgHtml = article.imageUrl ? `<img src="${article.imageUrl}" class="full-article-image">` : '';
         const avaHtml = article.authorAvatar ? `<img src="${article.authorAvatar}" class="mini-ava">` : '';
@@ -268,8 +299,3 @@ window.deleteArticle = async function(id) {
     const res = await fetch(`${API_URL}/articles/${id}`, { method: 'DELETE', headers: { 'x-admin-password': p }});
     if(res.ok) { alert("Deleted"); loadArticles(); } else { alert("Error"); }
 };
-
-window.highlightMenu = function(el) {
-    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-    el.classList.add('active');
-}
