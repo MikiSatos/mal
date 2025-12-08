@@ -1,164 +1,136 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const multer = require('multer');
 const mongoose = require('mongoose');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = "12345";
 
-// --- БЕЗОПАСНОЕ ПОДКЛЮЧЕНИЕ ---
-// Мы берем ссылку из переменных окружения (настроек Render)
-const MONGO_URI = process.env.MONGO_URL; 
-// ------------------------------
+// --- НАСТРОЙКИ (Берем из Render) ---
+const MONGO_URI = process.env.MONGO_URL;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+// Твой сайт на Render
+const BASE_URL = "https://mal-usev.onrender.com"; 
+
+// --- Cloudinary ---
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// 1. Подключение к MongoDB
-// Добавили проверку: если ссылки нет, пишем ошибку в консоль
-if (!MONGO_URI) {
-    console.error("❌ ОШИБКА: Не найдена переменная окружения MONGO_URL! Настрой её в Render.");
-} else {
-    mongoose.connect(MONGO_URI)
-        .then(() => console.log('✅ MongoDB connected!'))
-        .catch(err => console.error('❌ MongoDB error:', err));
-}
+// Настройка сессий (нужна для входа)
+app.use(session({
+    secret: 'secret_key_blog',
+    resave: false,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
-// 2. Схемы данных
-const CommentSchema = new mongoose.Schema({
-    id: Number,
-    author: String,
-    authorAvatar: String,
-    text: String,
-    replies: [{
-        id: Number,
-        author: String,
-        authorAvatar: String,
-        text: String
-    }]
-});
+// --- MONGODB ---
+if (!MONGO_URI) console.error("❌ No MONGO_URL");
+else mongoose.connect(MONGO_URI).then(() => console.log('✅ MongoDB connected!'));
 
-const ArticleSchema = new mongoose.Schema({
-    id: Number,
-    title: String,
-    content: String,
-    author: String,
-    authorAvatar: String,
-    imageUrl: String,
-    comments: [CommentSchema]
-});
-
+// --- SCHEMAS ---
+const CommentSchema = new mongoose.Schema({ id: Number, author: String, authorAvatar: String, text: String, replies: [] });
+const ArticleSchema = new mongoose.Schema({ id: Number, title: String, content: String, author: String, authorAvatar: String, imageUrl: String, comments: [CommentSchema] });
 const Article = mongoose.model('Article', ArticleSchema);
 
-// --- Папка для картинок ---
-const uploadDir = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+// --- GOOGLE STRATEGY ---
+if(GOOGLE_CLIENT_ID) {
+    passport.use(new GoogleStrategy({
+        clientID: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
+        callbackURL: `${BASE_URL}/auth/google/callback`
+      },
+      function(accessToken, refreshToken, profile, done) {
+        // Берем данные от Google
+        const user = {
+            first_name: profile.displayName,
+            photo_url: profile.photos[0].value
+        };
+        return done(null, user);
+      }
+    ));
+
+    passport.serializeUser((user, done) => done(null, user));
+    passport.deserializeUser((obj, done) => done(null, obj));
 }
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'public/uploads/'),
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
+// --- API ДЛЯ ВХОДА ---
+
+// 1. Кнопка нажата -> идем в Google
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+
+// 2. Google вернул пользователя обратно
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    // Передаем данные на фронтенд
+    const userData = JSON.stringify(req.user);
+    res.redirect(`/?googleUser=${encodeURIComponent(userData)}`);
+  }
+);
+
+// --- ЗАГРУЗКА ФАЙЛОВ ---
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: { folder: 'blog-uploads', allowed_formats: ['jpg', 'png', 'jpeg', 'webp'] },
 });
 const upload = multer({ storage: storage });
 
-// --- API ---
-
+// --- ОБЫЧНОЕ API ---
 app.get('/api/articles', async (req, res) => {
-    try {
-        const articles = await Article.find();
-        res.json(articles.map(a => ({
-            id: a.id,
-            title: a.title,
-            excerpt: a.content.substring(0, 100) + '...',
-            author: a.author,
-            authorAvatar: a.authorAvatar,
-            imageUrl: a.imageUrl
-        })));
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const articles = await Article.find();
+    res.json(articles);
 });
 
 app.get('/api/articles/:id', async (req, res) => {
-    try {
-        const article = await Article.findOne({ id: req.params.id });
-        if (!article) return res.status(404).json({ message: "Not found" });
-        res.json(article);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const article = await Article.findOne({ id: req.params.id });
+    if(!article) return res.status(404).json({msg:"Not found"});
+    res.json(article);
 });
 
 app.post('/api/articles', upload.single('imageFile'), async (req, res) => {
-    try {
-        const { title, content, author, authorAvatar } = req.body;
-        if (!title || !content || !author) return res.status(400).json({ message: "Empty fields" });
-
-        let imageUrl = "";
-        if (req.file) imageUrl = `/uploads/${req.file.filename}`;
-
-        const newArticle = new Article({
-            id: Date.now(),
-            title, content, author,
-            authorAvatar: authorAvatar || "",
-            imageUrl,
-            comments: []
-        });
-
-        await newArticle.save();
-        res.status(201).json(newArticle);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const { title, content, author, authorAvatar } = req.body;
+    let imageUrl = req.file ? req.file.path : "";
+    const newArticle = new Article({ id: Date.now(), title, content, author, authorAvatar, imageUrl, comments: [] });
+    await newArticle.save();
+    res.status(201).json(newArticle);
 });
 
 app.delete('/api/articles/:id', async (req, res) => {
-    if (req.headers['x-admin-password'] !== ADMIN_PASSWORD) return res.status(403).json({ message: "Wrong password" });
-    try {
-        await Article.deleteOne({ id: req.params.id });
-        res.json({ message: "Deleted" });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    if (req.headers['x-admin-password'] !== ADMIN_PASSWORD) return res.status(403).json({msg:"Wrong pass"});
+    await Article.deleteOne({ id: req.params.id });
+    res.json({msg:"Deleted"});
 });
 
 app.post('/api/articles/:id/comments', async (req, res) => {
-    try {
-        const article = await Article.findOne({ id: req.params.id });
-        if (!article) return res.status(404).json({ message: "Not found" });
-
-        const newComment = { 
-            id: Date.now(), 
-            author: req.body.author, 
-            text: req.body.text, 
-            authorAvatar: req.body.authorAvatar || "", 
-            replies: [] 
-        };
-        article.comments.push(newComment);
-        await article.save();
-        res.status(201).json(newComment);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const article = await Article.findOne({ id: req.params.id });
+    article.comments.push({ id: Date.now(), author: req.body.author, text: req.body.text, authorAvatar: req.body.authorAvatar, replies: [] });
+    await article.save();
+    res.status(201).json({msg:"OK"});
 });
 
 app.post('/api/articles/:artId/comments/:comId/replies', async (req, res) => {
-    try {
-        const article = await Article.findOne({ id: req.params.artId });
-        if (!article) return res.status(404).json({ message: "Not found" });
-
-        const comment = article.comments.find(c => c.id == req.params.comId);
-        if (!comment) return res.status(404).json({ message: "Comment not found" });
-
-        comment.replies.push({
-            id: Date.now(),
-            author: req.body.author,
-            text: req.body.text,
-            authorAvatar: req.body.authorAvatar || ""
-        });
-        await article.save();
-        res.json({ message: "OK" });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    const article = await Article.findOne({ id: req.params.artId });
+    const comment = article.comments.find(c => c.id == req.params.comId);
+    comment.replies.push({ id: Date.now(), author: req.body.author, text: req.body.text, authorAvatar: req.body.authorAvatar });
+    await article.save();
+    res.json({msg:"OK"});
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server on ${PORT}`));
