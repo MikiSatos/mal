@@ -22,7 +22,7 @@ header {
 }
 .logo { font-size: 24px; font-weight: bold; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); white-space: nowrap; }
 
-/* --- ЯЗЫКОВОЕ МЕНЮ (Кастомное) --- */
+/* --- ВЫБОР ЯЗЫКА --- */
 .lang-dropdown {
     position: relative;
     margin-right: 15px;
@@ -64,53 +64,44 @@ header {
 .lang-menu div:last-child { border-bottom: none; }
 .lang-menu div:hover { background: #FFD700; color: #000; }
 
-/* --- КНОПКИ ВХОДА (КРУГЛЫЕ ИКОНКИ) --- */
+/* --- КНОПКИ ВХОДА (ВЫРАВНИВАНИЕ) --- */
 #login-buttons {
     display: flex;
-    align-items: center;
-    gap: 15px;
+    align-items: center; /* Центрируем кнопки по вертикали */
+    gap: 15px;           /* Расстояние между кнопками */
+    height: 30px;        /* Фиксируем высоту контейнера */
 }
 
-/* Общий класс для круглых кнопок */
-.icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+/* Telegram контейнер */
+#tg-login-btn {
     display: flex;
     align-items: center;
+    height: 100%;        /* Занимаем всю высоту контейнера */
+}
+
+/* Google Кнопка */
+.google-btn {
+    background: white; 
+    color: #333; 
+    padding: 0 15px; 
+    border-radius: 5px; 
+    text-decoration: none; 
+    font-weight: 600; 
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    display: flex; 
+    align-items: center; 
     justify-content: center;
+    gap: 8px;
+    
     transition: 0.3s;
-    overflow: hidden; /* Важно для обрезки виджетов */
-    cursor: pointer;
+    border: none;
+    height: 100%;        /* Занимаем всю высоту контейнера */
+    box-sizing: border-box;
+    white-space: nowrap;
 }
-
-/* 1. Google Style */
-.google-icon {
-    background: transparent;
-    border: 1px solid #FFD700;
-    color: #FFD700;
-    text-decoration: none;
-    font-size: 20px;
-}
-.google-icon:hover {
-    background: #FFD700;
-    color: #000;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-}
-
-/* 2. Telegram Style (Фильтр цвета) */
-.tg-filter {
-    border: 1px solid #FFD700; /* Золотая рамка вокруг виджета */
-    background: #000;
-}
-.tg-filter iframe {
-    /* Этот фильтр превращает СИНИЙ цвет Telegram в БРОНЗОВО-ЗОЛОТОЙ */
-    filter: sepia(100%) hue-rotate(40deg) saturate(400%) contrast(0.9) brightness(0.9);
-    transform: scale(1.4); /* Увеличиваем, чтобы скрыть белые углы виджета */
-}
-.tg-filter:hover {
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-}
+.google-btn:hover { background: #f1f1f1; cursor: pointer; }
 
 
 /* --- ПРОФИЛЬ --- */
@@ -123,7 +114,7 @@ header {
 #user-name { color: #FFD700; font-weight: bold; }
 .header-right { display: flex; align-items: center; gap: 15px; }
 
-/* --- ОСТАЛЬНЫЕ СТИЛИ (КНОПКИ, СЕТКА) --- */
+/* --- ОСТАЛЬНЫЕ СТИЛИ --- */
 button {
     background: linear-gradient(45deg, #FFD700, #ffb900);
     color: #000; border: none; padding: 10px 20px;
@@ -159,6 +150,7 @@ button.secondary:hover { background: #FFD700; color: #000; }
 .menu-item.active { background: linear-gradient(90deg, rgba(255,215,0,0.2), transparent); border-left: 3px solid #FFD700; color: #FFD700; }
 .menu-section { font-size: 0.75rem; color: #888; font-weight: bold; margin-top: 25px; margin-bottom: 10px; letter-spacing: 1px; padding-left: 10px; }
 hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
+
 main { padding: 30px; width: 100%; box-sizing: border-box; max-width: 900px; }
 
 @media (max-width: 768px) {
