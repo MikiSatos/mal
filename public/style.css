@@ -15,53 +15,57 @@ header { background: linear-gradient(to bottom, #1f1f1f, #000000); border-bottom
 .lang-menu div:last-child { border-bottom: none; }
 .lang-menu div:hover { background: #FFD700; color: #000; }
 
-/* --- КНОПКИ ВХОДА (КОНТЕЙНЕР) --- */
-#login-buttons { display: flex; align-items: center; gap: 15px; }
+/* --- КНОПКИ ВХОДА (ТАБЛЕТКИ) --- */
+#login-buttons { display: flex; align-items: center; gap: 10px; }
 
-/* Базовый стиль для иконки (40x40) */
-.icon-btn {
-    width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    transition: 0.3s; cursor: pointer; text-decoration: none; font-size: 20px;
-    background: transparent; border: 1px solid #FFD700; color: #FFD700; box-sizing: border-box;
+/* Общий стиль "Таблетки" */
+.pill-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; /* Расстояние между иконкой и текстом */
+    padding: 6px 15px; /* Размер кнопки */
+    border: 1px solid #FFD700;
+    border-radius: 20px; /* Делает форму таблетки */
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    background: transparent;
+    transition: 0.3s;
+    cursor: pointer;
+    min-width: 100px; /* Минимальная ширина, чтобы были одинаковыми */
 }
-.icon-btn:hover { background: #FFD700; color: #000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
 
-/* --- НОВАЯ СТРУКТУРА TELEGRAM --- */
-.tg-container {
-    position: relative; /* Чтобы держать слои вместе */
-    width: 40px; 
-    height: 40px;
+.pill-btn:hover {
+    background: #FFD700;
+    color: #000;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-/* Слой 1: Визуал (Золотая кнопка) */
-.tg-visual {
+.pill-btn i { font-size: 16px; }
+
+/* --- ХИТРЫЙ TELEGRAM --- */
+.tg-pill-wrapper {
+    position: relative; /* Держит слои */
+    display: inline-block;
+}
+
+/* Настоящий виджет (Невидимый) */
+.tg-overlay-pill {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 1; /* Внизу */
-}
-
-/* Слой 2: Оверлей (Настоящий клик) */
-.tg-overlay {
-    position: absolute;
-    top: -10px; left: -10px; /* Сдвигаем влево-вверх */
-    width: 60px; height: 60px; /* Делаем БОЛЬШЕ самой кнопки */
-    z-index: 100; /* Наверху */
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 100; /* Поверх всего */
     opacity: 0.01; /* Почти прозрачный */
     overflow: hidden;
-    /* Убираем border-radius у обертки, чтобы виджет не резался */
+    cursor: pointer;
+    border-radius: 20px;
 }
 
-.tg-overlay iframe {
-    width: 200% !important; 
-    height: 200% !important; 
-    transform: scale(1.2); /* Растягиваем сам виджет */
+.tg-overlay-pill iframe {
+    /* Растягиваем виджет чуть шире, чтобы покрыть текст */
+    width: 150% !important; 
+    height: 150% !important; 
+    transform: scale(1.1) translate(-10px, -5px);
     position: absolute;
-    top: -20px;
-    left: -20px;
 }
-
 
 /* --- ОСТАЛЬНОЕ --- */
 #user-profile { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid #FFD700; }
