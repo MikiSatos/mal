@@ -32,18 +32,21 @@
             </div>
 
             <div id="login-buttons">
-                <a href="/auth/google" class="google-btn">
-                    <i class="fab fa-google"></i> Google
+                
+                <a href="/auth/google" class="icon-btn google-icon" title="Google">
+                    <i class="fab fa-google"></i>
                 </a>
 
-                <div id="tg-login-btn">
+                <div id="tg-login-btn" class="icon-btn tg-wrapper">
                     <script async src="https://telegram.org/js/telegram-widget.js?22" 
                         data-telegram-login="Miki_Satos_123_bot" 
-                        data-size="medium" 
-                        data-radius="5" 
+                        data-size="large" 
+                        data-userpic="false" 
+                        data-radius="50" 
                         data-onauth="onTelegramAuth(user)" 
                         data-request-access="write"></script>
                 </div>
+
             </div>
 
         </div>
@@ -60,20 +63,16 @@
             <div class="menu-item" onclick="loadRules(); highlightMenu(this)" data-i18n="menu_rules">Правила</div>
         </aside>
 
-        <main id="app">
-            </main>
+        <main id="app"></main>
     </div>
 
     <div id="create-modal" class="modal hidden">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2 data-i18n="modal_title">Написать статью</h2>
-            
             <input type="text" id="new-title" placeholder="Заголовок..." required>
-            
             <label style="color:#aaa; display:block; margin-bottom:5px;" data-i18n="modal_image">Картинка (файл):</label>
             <input type="file" id="new-image-file" accept="image/*" style="margin-bottom:15px;">
-
             <textarea id="new-content" placeholder="Текст статьи..." rows="10" required></textarea>
             <button onclick="submitArticle()" data-i18n="modal_publish">Опубликовать</button>
         </div>
