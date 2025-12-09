@@ -44,14 +44,14 @@ header {
 .lang-menu div:last-child { border-bottom: none; }
 .lang-menu div:hover { background: #FFD700; color: #000; }
 
-/* --- КРУГЛЫЕ КНОПКИ ВХОДА --- */
+/* --- КНОПКИ ВХОДА --- */
 #login-buttons {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-/* Общий стиль для иконки (40x40) */
+/* Общий стиль иконки */
 .icon-btn {
     width: 40px;
     height: 40px;
@@ -63,35 +63,49 @@ header {
     cursor: pointer;
     text-decoration: none;
     font-size: 20px;
-    position: relative; /* Важно для наложения */
+    position: relative; /* База для наложения */
     background: transparent;
     border: 1px solid #FFD700;
     color: #FFD700;
     box-sizing: border-box;
 }
-
-/* Эффект при наведении (Заливка золотом) */
 .icon-btn:hover {
     background: #FFD700;
     color: #000;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
 }
 
-/* --- МАГИЯ: НЕВИДИМЫЙ СЛОЙ TELEGRAM --- */
-.tg-invisible {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    opacity: 0;      /* Делаем полностью прозрачным */
-    z-index: 10;     /* Кладем поверх иконки */
-    overflow: hidden;
-    border-radius: 50%;
-}
-.tg-invisible iframe {
-    width: 100% !important;
-    height: 100% !important;
-    transform: scale(1.1); /* Растягиваем, чтобы заполнить весь круг */
+/* Иконка самолетика (чтобы она не перехватывала клик) */
+.telegram-icon i {
+    pointer-events: none; /* Пропускаем клик сквозь иконку */
+    z-index: 1;
 }
 
+/* --- ИСПРАВЛЕННЫЙ НЕВИДИМЫЙ СЛОЙ --- */
+.tg-invisible {
+    position: absolute;
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%); /* Центрируем */
+    width: 50px;  /* ЧУТЬ БОЛЬШЕ КНОПКИ */
+    height: 50px; /* ЧУТЬ БОЛЬШЕ КНОПКИ */
+    z-index: 100; /* Самый верхний слой! */
+    opacity: 0;   /* Невидимый */
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 50%;
+    pointer-events: auto; /* ОБЯЗАТЕЛЬНО ЛОВИТ КЛИКИ */
+}
+
+/* Растягиваем сам виджет внутри */
+.tg-invisible iframe {
+    width: 200% !important; /* Огромный размер */
+    height: 200% !important;
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    pointer-events: auto;
+}
 
 /* --- ПРОФИЛЬ --- */
 #user-profile {
@@ -103,7 +117,7 @@ header {
 #user-name { color: #FFD700; font-weight: bold; }
 .header-right { display: flex; align-items: center; gap: 15px; }
 
-/* --- ОБЩИЕ ЭЛЕМЕНТЫ --- */
+/* --- ОБЩИЕ --- */
 button {
     background: linear-gradient(45deg, #FFD700, #ffb900);
     color: #000; border: none; padding: 10px 20px;
@@ -127,7 +141,7 @@ hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
 main { padding: 30px; width: 100%; box-sizing: border-box; max-width: 900px; }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } header { padding: 0 15px; } main { padding: 15px; } }
 
-/* КАРТОЧКИ */
+/* CARDS */
 .article-card { background: linear-gradient(145deg, #1e1e1e, #252525); border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 5px 10px rgba(0,0,0,0.3); transition: 0.3s; }
 .article-card:hover { border-color: #FFD700; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 215, 0, 0.15); }
 .article-card h2 { margin-top: 0; color: #FFD700; cursor: pointer; }
