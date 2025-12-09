@@ -44,12 +44,10 @@
                 </a>
 
                 <div class="tg-pill-wrapper">
-                    
                     <div class="pill-btn telegram-visual">
                         <i class="fab fa-telegram-plane"></i>
                         <span>Telegram</span>
                     </div>
-                    
                     <div class="tg-overlay-pill">
                         <script async src="https://telegram.org/js/telegram-widget.js?22" 
                             data-telegram-login="Miki_Satos_123_bot" 
@@ -58,7 +56,6 @@
                             data-onauth="onTelegramAuth(user)" 
                             data-request-access="write"></script>
                     </div>
-
                 </div>
             </div>
 
@@ -83,12 +80,9 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2 data-i18n="modal_title">Написать статью</h2>
-            
             <input type="text" id="new-title" placeholder="Заголовок..." required>
-            
             <label style="color:#aaa; display:block; margin-bottom:5px;" data-i18n="modal_image">Картинка (файл):</label>
             <input type="file" id="new-image-file" accept="image/*" style="margin-bottom:15px;">
-
             <textarea id="new-content" placeholder="Текст статьи..." rows="10" required></textarea>
             <button onclick="submitArticle()" data-i18n="modal_publish">Опубликовать</button>
         </div>
