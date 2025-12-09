@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B&Y Blog</title>
+    <title>B&Y BLOG</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -32,18 +32,21 @@
             </div>
 
             <div id="login-buttons">
-                <a href="/auth/google" class="google-btn">
-                    <i class="fab fa-google"></i> Google
+                
+                <a href="/auth/google" class="icon-btn google-icon" title="Google Login">
+                    <i class="fab fa-google"></i>
                 </a>
 
-                <div id="tg-login-btn">
+                <div id="tg-login-btn" class="icon-btn tg-filter">
                     <script async src="https://telegram.org/js/telegram-widget.js?22" 
                         data-telegram-login="Miki_Satos_123_bot" 
-                        data-size="medium" 
-                        data-radius="5" 
+                        data-size="large" 
+                        data-userpic="false" 
+                        data-radius="50" 
                         data-onauth="onTelegramAuth(user)" 
                         data-request-access="write"></script>
                 </div>
+
             </div>
 
         </div>
