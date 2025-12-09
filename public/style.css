@@ -1,136 +1,69 @@
 /* --- БАЗА --- */
-body {
-    background: linear-gradient(135deg, #232526, #414345);
-    background-color: #121212;
-    background-attachment: fixed;
-    min-height: 100vh;
-    color: #e0e0e0;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    margin: 0; padding: 0;
-    overflow-x: hidden;
-}
+body { background: linear-gradient(135deg, #232526, #414345); background-color: #121212; background-attachment: fixed; min-height: 100vh; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
 
 /* --- ШАПКА --- */
-header {
-    background: linear-gradient(to bottom, #1f1f1f, #000000);
-    border-bottom: 2px solid #FFD700;
-    height: 70px; padding: 0 20px;
-    display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    position: sticky; top: 0; z-index: 1000;
-    width: 100%; box-sizing: border-box;
-}
+header { background: linear-gradient(to bottom, #1f1f1f, #000000); border-bottom: 2px solid #FFD700; height: 70px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 1000; width: 100%; box-sizing: border-box; }
 .logo { font-size: 24px; font-weight: bold; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); white-space: nowrap; }
 
 /* --- МЕНЮ ЯЗЫКОВ --- */
 .lang-dropdown { position: relative; margin-right: 15px; }
-#current-lang-btn {
-    background: transparent; color: #FFD700; border: 1px solid #FFD700;
-    padding: 5px 15px; border-radius: 20px; font-weight: bold; cursor: pointer;
-    min-width: 60px; transition: 0.3s; font-family: inherit;
-}
+#current-lang-btn { background: transparent; color: #FFD700; border: 1px solid #FFD700; padding: 5px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; min-width: 60px; transition: 0.3s; font-family: inherit; }
 #current-lang-btn:hover { background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-.lang-menu {
-    position: absolute; top: 130%; left: 50%; transform: translateX(-50%);
-    background: #1a1a1a; border: 1px solid #FFD700; border-radius: 15px;
-    overflow: hidden; width: 90px; box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    z-index: 2000; display: flex; flex-direction: column;
-}
+.lang-menu { position: absolute; top: 130%; left: 50%; transform: translateX(-50%); background: #1a1a1a; border: 1px solid #FFD700; border-radius: 15px; overflow: hidden; width: 90px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); z-index: 2000; display: flex; flex-direction: column; }
 .lang-menu.hidden { display: none; }
-.lang-menu div {
-    padding: 10px; color: #fff; cursor: pointer; text-align: center;
-    transition: 0.2s; font-size: 14px; border-bottom: 1px solid #333;
-}
+.lang-menu div { padding: 10px; color: #fff; cursor: pointer; text-align: center; transition: 0.2s; font-size: 14px; border-bottom: 1px solid #333; }
 .lang-menu div:last-child { border-bottom: none; }
 .lang-menu div:hover { background: #FFD700; color: #000; }
 
 /* --- КНОПКИ ВХОДА --- */
-#login-buttons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+#login-buttons { display: flex; align-items: center; gap: 15px; }
 
 /* Общий стиль иконки */
 .icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 20px;
-    position: relative; /* База для наложения */
-    background: transparent;
-    border: 1px solid #FFD700;
-    color: #FFD700;
-    box-sizing: border-box;
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.3s; cursor: pointer; text-decoration: none; font-size: 20px;
+    position: relative; /* База */
+    background: transparent; border: 1px solid #FFD700; color: #FFD700; box-sizing: border-box;
 }
-.icon-btn:hover {
-    background: #FFD700;
-    color: #000;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+.icon-btn:hover { background: #FFD700; color: #000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+
+/* --- ИСПРАВЛЕННЫЙ TELEGRAM --- */
+.telegram-wrapper {
+    overflow: hidden; /* Обрезаем всё, что вылезло за круг */
 }
 
-/* Иконка самолетика (чтобы она не перехватывала клик) */
-.telegram-icon i {
-    pointer-events: none; /* Пропускаем клик сквозь иконку */
+/* Красивая иконка (Визуал) */
+.tg-icon-visual {
+    pointer-events: none; /* Пропускаем клик сквозь картинку */
     z-index: 1;
 }
 
-/* --- ИСПРАВЛЕННЫЙ НЕВИДИМЫЙ СЛОЙ --- */
-.tg-invisible {
+/* Настоящий виджет (Слой клика) */
+.tg-real-widget {
     position: absolute;
-    top: 50%; 
-    left: 50%;
-    transform: translate(-50%, -50%); /* Центрируем */
-    width: 50px;  /* ЧУТЬ БОЛЬШЕ КНОПКИ */
-    height: 50px; /* ЧУТЬ БОЛЬШЕ КНОПКИ */
-    z-index: 100; /* Самый верхний слой! */
-    opacity: 0;   /* Невидимый */
+    top: -50px; left: -50px; /* Сдвигаем, чтобы центр попал в кнопку */
+    width: 200px; height: 200px; /* Делаем ОГРОМНЫМ */
+    z-index: 100; /* Поверх всего */
+    opacity: 0.01; /* ПОЧТИ прозрачный (браузер разрешит клик) */
     cursor: pointer;
-    overflow: hidden;
-    border-radius: 50%;
-    pointer-events: auto; /* ОБЯЗАТЕЛЬНО ЛОВИТ КЛИКИ */
+}
+.tg-real-widget iframe {
+    width: 100% !important; height: 100% !important; transform: scale(3);
 }
 
-/* Растягиваем сам виджет внутри */
-.tg-invisible iframe {
-    width: 200% !important; /* Огромный размер */
-    height: 200% !important;
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    pointer-events: auto;
-}
-
-/* --- ПРОФИЛЬ --- */
-#user-profile {
-    display: flex; align-items: center; gap: 10px;
-    background: rgba(255,255,255,0.1); padding: 5px 15px;
-    border-radius: 20px; border: 1px solid #FFD700;
-}
+/* --- ОСТАЛЬНОЕ --- */
+#user-profile { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid #FFD700; }
 #user-avatar { width: 30px; height: 30px; border-radius: 50%; }
 #user-name { color: #FFD700; font-weight: bold; }
 .header-right { display: flex; align-items: center; gap: 15px; }
 
-/* --- ОБЩИЕ --- */
-button {
-    background: linear-gradient(45deg, #FFD700, #ffb900);
-    color: #000; border: none; padding: 10px 20px;
-    font-weight: bold; cursor: pointer; text-transform: uppercase;
-    border-radius: 4px; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
-    transition: 0.3s; white-space: nowrap;
-}
+button { background: linear-gradient(45deg, #FFD700, #ffb900); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; border-radius: 4px; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3); transition: 0.3s; white-space: nowrap; }
 button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 215, 0, 0.5); }
 button.secondary { background: transparent; border: 1px solid #FFD700; color: #FFD700; font-size: 0.8rem; padding: 5px 10px; box-shadow: none; }
 button.secondary:hover { background: #FFD700; color: #000; }
 .delete-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; font-size: 0.8rem; padding: 8px 15px; margin-top: 15px; box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3); }
 
-/* LAYOUT */
 .layout { display: grid; grid-template-columns: 260px 1fr; width: 100%; min-height: calc(100vh - 70px); }
 .sidebar { background: rgba(0, 0, 0, 0.4); border-right: 1px solid #444; padding: 20px; position: sticky; top: 70px; height: calc(100vh - 70px); overflow-y: auto; box-sizing: border-box; }
 .menu-item { padding: 12px 15px; margin-bottom: 5px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-weight: 500; display: flex; align-items: center; gap: 10px; color: #ccc; }
@@ -141,7 +74,6 @@ hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
 main { padding: 30px; width: 100%; box-sizing: border-box; max-width: 900px; }
 @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } header { padding: 0 15px; } main { padding: 15px; } }
 
-/* CARDS */
 .article-card { background: linear-gradient(145deg, #1e1e1e, #252525); border: 1px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 5px 10px rgba(0,0,0,0.3); transition: 0.3s; }
 .article-card:hover { border-color: #FFD700; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 215, 0, 0.15); }
 .article-card h2 { margin-top: 0; color: #FFD700; cursor: pointer; }
