@@ -15,42 +15,53 @@ header { background: linear-gradient(to bottom, #1f1f1f, #000000); border-bottom
 .lang-menu div:last-child { border-bottom: none; }
 .lang-menu div:hover { background: #FFD700; color: #000; }
 
-/* --- КНОПКИ ВХОДА --- */
+/* --- КНОПКИ ВХОДА (КОНТЕЙНЕР) --- */
 #login-buttons { display: flex; align-items: center; gap: 15px; }
 
-/* Общий стиль иконки */
+/* Базовый стиль для иконки (40x40) */
 .icon-btn {
     width: 40px; height: 40px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     transition: 0.3s; cursor: pointer; text-decoration: none; font-size: 20px;
-    position: relative; /* База */
     background: transparent; border: 1px solid #FFD700; color: #FFD700; box-sizing: border-box;
 }
 .icon-btn:hover { background: #FFD700; color: #000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
 
-/* --- ИСПРАВЛЕННЫЙ TELEGRAM --- */
-.telegram-wrapper {
-    overflow: hidden; /* Обрезаем всё, что вылезло за круг */
+/* --- НОВАЯ СТРУКТУРА TELEGRAM --- */
+.tg-container {
+    position: relative; /* Чтобы держать слои вместе */
+    width: 40px; 
+    height: 40px;
 }
 
-/* Красивая иконка (Визуал) */
-.tg-icon-visual {
-    pointer-events: none; /* Пропускаем клик сквозь картинку */
-    z-index: 1;
-}
-
-/* Настоящий виджет (Слой клика) */
-.tg-real-widget {
+/* Слой 1: Визуал (Золотая кнопка) */
+.tg-visual {
     position: absolute;
-    top: -50px; left: -50px; /* Сдвигаем, чтобы центр попал в кнопку */
-    width: 200px; height: 200px; /* Делаем ОГРОМНЫМ */
-    z-index: 100; /* Поверх всего */
-    opacity: 0.01; /* ПОЧТИ прозрачный (браузер разрешит клик) */
-    cursor: pointer;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1; /* Внизу */
 }
-.tg-real-widget iframe {
-    width: 100% !important; height: 100% !important; transform: scale(3);
+
+/* Слой 2: Оверлей (Настоящий клик) */
+.tg-overlay {
+    position: absolute;
+    top: -10px; left: -10px; /* Сдвигаем влево-вверх */
+    width: 60px; height: 60px; /* Делаем БОЛЬШЕ самой кнопки */
+    z-index: 100; /* Наверху */
+    opacity: 0.01; /* Почти прозрачный */
+    overflow: hidden;
+    /* Убираем border-radius у обертки, чтобы виджет не резался */
 }
+
+.tg-overlay iframe {
+    width: 200% !important; 
+    height: 200% !important; 
+    transform: scale(1.2); /* Растягиваем сам виджет */
+    position: absolute;
+    top: -20px;
+    left: -20px;
+}
+
 
 /* --- ОСТАЛЬНОЕ --- */
 #user-profile { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid #FFD700; }
