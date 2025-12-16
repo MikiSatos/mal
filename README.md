@@ -55,16 +55,12 @@ npm start
 
 4. Otwórz aplikację w przeglądarce:
 ```
-http://localhost:3000
+https://mal-usev.onrender.com
 ```
 
-## Hosting
-- Działająca aplikacja:
-- GitHub Pages (strona projektowa):
-
 ## Materiały projektowe
-- Prezentacja PDF:
-- Nagranie wideo:
+- Prezentacja PDF: [Zobacz prezentację](docs/prezentacja.pdf)
+- Nagranie wideo: https://youtu.be/FA6vkxsV9U4
 
 ## Autorzy
 - Ilya Raiko 68949
