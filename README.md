@@ -55,8 +55,11 @@ npm start
 
 4. Otwórz aplikację w przeglądarce:
 ```
-https://mal-usev.onrender.com
+http://localhost:3000
 ```
+## Aplikacje online:
+- 🌐 Live demo: https://mal-usev.onrender.com
+- 🌍 GitHub Pages: https://mikisatos.github.io/mal/
 
 ## Materiały projektowe
 - 📄 Prezentacja PDF: [Zobacz prezentację](https://github.com/MikiSatos/mal/raw/main/docs/prezentacja_wyklad.pdf)
