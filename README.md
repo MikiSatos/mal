@@ -58,12 +58,8 @@ npm start
 https://mal-usev.onrender.com
 ```
 
-## Hosting
-- Działająca aplikacja:
-- GitHub Pages (strona projektowa):
-
 ## Materiały projektowe
-- Prezentacja PDF:
+- Prezentacja PDF: [Zobacz prezentację](docs/prezentacja.pdf)
 - Nagranie wideo: https://youtu.be/FA6vkxsV9U4
 
 ## Autorzy
