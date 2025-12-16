@@ -64,7 +64,7 @@ https://mal-usev.onrender.com
 
 ## Materiały projektowe
 - Prezentacja PDF:
-- Nagranie wideo:
+- Nagranie wideo: https://youtu.be/FA6vkxsV9U4
 
 ## Autorzy
 - Ilya Raiko 68949
