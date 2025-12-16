@@ -59,7 +59,7 @@ https://mal-usev.onrender.com
 ```
 
 ## Materiały projektowe
-- Prezentacja PDF: [Zobacz prezentację](docs/prezentacja_wyklad.pdf)
+- 📄 Prezentacja PDF: [Zobacz prezentację](https://github.com/MikiSatos/mal/raw/main/docs/prezentacja_wyklad.pdf)
 - Nagranie wideo: https://youtu.be/FA6vkxsV9U4
 
 ## Autorzy
